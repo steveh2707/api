@@ -23,7 +23,7 @@ router.post('/login', (req, res) => {
       if (response && response.length) {
         res.json({
           success: true,
-          message: "successful login",
+          message: "user successfully logged in",
           user: {
             user_id: response[0].user_id,
             user_name: response[0].user_name

@@ -4,26 +4,25 @@ const connection = require('../db')
 
 router.get('/collections', (req, res) => {
 
-  let page = req.query.page || 1;
+  let page = req.query.page || 0;
 
   let resultsPerPage = 12;
 
-  let pagestart = (page - 1) * resultsPerPage + 1;
-  let pageend = pagestart + resultsPerPage - 1;
+  let pagestart = page * resultsPerPage;
+  let pageend = pagestart + resultsPerPage;
 
   let sql = `
   SELECT collection_id, collection_name, collection_creation_date, collection_last_edit_date, collection.user_id, user_name 
     FROM collection
     LEFT JOIN user on collection.user_id=user.user_id  
-    WHERE collection_id BETWEEN ? AND ?
-    ORDER BY collection_last_edit_date DESC;
-  SELECT collection_id, cover_image_url, album_num FROM collection_album
+    ORDER BY collection_last_edit_date DESC
+    LIMIT ?, ?;
+  SELECT collection_id, cover_image_url FROM collection_album
     INNER JOIN album on collection_album.album_id=album.album_id
-    WHERE collection_id BETWEEN ? AND ?
     ORDER BY album_num;
   `
 
-  connection.query(sql, [pagestart, pageend, pagestart, pageend], (err, response) => {
+  connection.query(sql, [pagestart, pageend], (err, response) => {
     if (err) {
       res.json(err)
     } else {
