@@ -20,7 +20,7 @@ router.get('/albums/:albumid', (req, res) => {
     FROM album_subgenre
     LEFT JOIN genre on album_subgenre.genre_id=genre.genre_id
     WHERE album_id=?;
-  SELECT track_id, track_name 
+  SELECT track_id, track_name, track_playtime 
     FROM track
     WHERE album_id=?;
   SELECT collection.collection_id, collection_name
