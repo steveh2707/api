@@ -24,7 +24,11 @@ router.get('/collections/:collectionid', (req, res) => {
 
   connection.query(sql, [c_id, c_id], (err, response) => {
     if (err) {
-      res.json(err)
+      res.json({
+        success: false,
+        message: "Unsuccessful",
+        error: err
+      })
     } else {
 
       try {
@@ -48,9 +52,16 @@ router.get('/collections/:collectionid', (req, res) => {
           })
         })
 
-        res.json(collectiondetails)
+        res.json({
+          success: true,
+          collection: collectiondetails
+        })
       } catch {
-        res.json({ message: "collection does not exist" })
+        res.json({
+          success: false,
+          message: "Unsuccessful",
+          error: "Collection does not exist"
+        })
       }
     }
   })
