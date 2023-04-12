@@ -5,7 +5,7 @@ const connection = require('../db')
 
 router.post('/reordercollection/:collectionid', (req, res) => {
 
-  let C_id = req.params.collectionid
+  // let c_id = req.params.collectionid
 
   // check body contains all required variables
   // if (!req.body.apiKey) return errorHandler("API key missing");
@@ -13,15 +13,34 @@ router.post('/reordercollection/:collectionid', (req, res) => {
   // if (!req.body.collectionName) return errorHandler("collectionName missing");
   // if (!req.body.albumIDArray) return errorHandler("albumIDArray missing");
 
-  let albumNumStart = req.body.albumNumStart;
+  let collectionAlbumID = req.body.collectionAlbumID;
   let albumNumEnd = req.body.albumNumEnd;
-  // let album_ids = req.body.albumIDArray
-  // let api_key = req.body.apiKey
-  // const currentDateTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-  console.log(C_id)
-  console.log(albumNumStart)
+  console.log(collectionAlbumID)
   console.log(albumNumEnd)
+
+  let sql = `
+  UPDATE collection_album SET album_num = ? WHERE collection_album.collection_album_id = ?
+  `
+
+  connection.query(sql, [albumNumEnd, collectionAlbumID], (err, response) => {
+
+    if (err) {
+      res.json(err)
+    } else {
+      if (response.changedRows === 0) {
+        res.json({
+          success: false,
+          message: response.message
+        })
+      } else {
+        res.json({
+          success: true,
+          message: "album num successfully changed",
+        })
+      }
+    }
+  })
 
 })
 
