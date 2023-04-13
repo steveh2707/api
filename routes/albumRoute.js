@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router();
 const connection = require('../db')
+const errorHandler = require('./handlers').errorHandler
+const dataHandler = require('./handlers').dataHandler
 
 router.get('/albums/:albumid', (req, res) => {
 
@@ -30,42 +32,40 @@ router.get('/albums/:albumid', (req, res) => {
   `
 
   connection.query(sql, [a_id, a_id, a_id, a_id, a_id], (err, response) => {
-    if (err) {
-      res.json(err)
-    } else {
+    if (err) return res.json(errorHandler("Database connection error", err));
 
-      try {
-        let albumdetails = response[0][0]
-        let artists = response[1]
-        let subgenres = response[2]
-        let tracks = response[3]
-        let collections = response[4]
+    try {
+      let albumdetails = response[0][0]
+      let artists = response[1]
+      let subgenres = response[2]
+      let tracks = response[3]
+      let collections = response[4]
 
-        albumdetails.artists = []
-        artists.forEach(artist => {
-          albumdetails.artists.push(artist)
-        })
+      albumdetails.artists = []
+      artists.forEach(artist => {
+        albumdetails.artists.push(artist)
+      })
 
-        albumdetails.subgenres = []
-        subgenres.forEach(genre => {
-          albumdetails.subgenres.push(genre)
-        })
+      albumdetails.subgenres = []
+      subgenres.forEach(genre => {
+        albumdetails.subgenres.push(genre)
+      })
 
-        albumdetails.tracks = []
-        tracks.forEach(album => {
-          albumdetails.tracks.push(album)
-        })
+      albumdetails.tracks = []
+      tracks.forEach(album => {
+        albumdetails.tracks.push(album)
+      })
 
-        albumdetails.collections = []
-        collections.forEach(collection => {
-          albumdetails.collections.push(collection)
-        })
+      albumdetails.collections = []
+      collections.forEach(collection => {
+        albumdetails.collections.push(collection)
+      })
 
-        res.json(albumdetails)
-      } catch {
-        res.json({ message: "collection does not exist" })
-      }
+      res.json(dataHandler("Successfully loaded album", albumdetails))
+    } catch {
+      res.json(errorHandler("Collection does not exist", err));
     }
+
   })
 })
 

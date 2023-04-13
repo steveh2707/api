@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router();
 const connection = require('../db')
+const errorHandler = require('./handlers').errorHandler
+const dataHandler = require('./handlers').dataHandler
 
 router.get('/collections/:collectionid', (req, res) => {
 
@@ -28,52 +30,40 @@ router.get('/collections/:collectionid', (req, res) => {
   `
 
   connection.query(sql, [c_id, c_id, c_id], (err, response) => {
-    if (err) {
-      res.json({
-        success: false,
-        message: "Unsuccessful",
-        error: err
+    if (err) return res.json(errorHandler("Database connection error", err));
+
+    try {
+      let collectiondetails = response[0][0]
+      let albums = response[1]
+      let artists = response[2]
+      let comments = response[3]
+
+      collectiondetails.albums = []
+      albums.forEach(album => {
+        collectiondetails.albums.push(album)
+        album.albumArtists = []
+
+        artists.forEach(artist => {
+          if (artist.album_id == album.album_id) {
+            album.albumArtists.push({
+              artist_id: artist.artist_id,
+              artist_name: artist.artist_name
+            })
+          }
+        })
       })
-    } else {
 
-      try {
-        let collectiondetails = response[0][0]
-        let albums = response[1]
-        let artists = response[2]
-        let comments = response[3]
+      collectiondetails.comments = []
+      comments.forEach(comment => {
+        collectiondetails.comments.push(comment)
+      })
 
-        collectiondetails.albums = []
-        albums.forEach(album => {
-          collectiondetails.albums.push(album)
-          album.albumArtists = []
+      res.json(dataHandler("Successfully loaded collection", collectiondetails))
 
-          artists.forEach(artist => {
-            if (artist.album_id == album.album_id) {
-              album.albumArtists.push({
-                artist_id: artist.artist_id,
-                artist_name: artist.artist_name
-              })
-            }
-          })
-        })
-
-        collectiondetails.comments = []
-        comments.forEach(comment => {
-          collectiondetails.comments.push(comment)
-        })
-
-        res.json({
-          success: true,
-          collection: collectiondetails
-        })
-      } catch {
-        res.json({
-          success: false,
-          message: "Unsuccessful",
-          error: "Collection does not exist"
-        })
-      }
+    } catch {
+      res.json(errorHandler("Collection does not exist", err));
     }
+
   })
 })
 

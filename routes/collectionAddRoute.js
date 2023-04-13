@@ -1,23 +1,16 @@
 const express = require('express')
 const router = express.Router();
 const connection = require('../db')
+const errorHandler = require('./handlers').errorHandler
+const dataHandler = require('./handlers').dataHandler
 
 
 router.post('/addcollection', (req, res) => {
 
-  errorHandler = (err) => {
-    res.json({
-      success: false,
-      message: "Unsuccessful",
-      error: err
-    })
-  }
-
   // check body contains all required variables
-  if (!req.body.apiKey) return errorHandler("API key missing");
-  if (!req.body.userID) return errorHandler("userID missing");
-  if (!req.body.collectionName) return errorHandler("collectionName missing");
-  if (!req.body.albumIDArray) return errorHandler("albumIDArray missing");
+  if (!req.body.userID) return res.json(errorHandler("User ID missing"));
+  if (!req.body.collectionName) return res.json(errorHandler("Collection name missing"));
+  if (!req.body.albumIDArray) return res.json(errorHandler("albumIDArray missing"));
 
   let user_id = req.body.userID;
   let collection_name = req.body.collectionName;
@@ -26,25 +19,23 @@ router.post('/addcollection', (req, res) => {
   const currentDateTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
   connection.getConnection(function (err, conn) {
-    if (err) {
-      return errorHandler(err);
-    }
+    if (err) return res.json(errorHandler("Database connection error", err));
 
     conn.beginTransaction((err) => {
       if (err) {
-        return errorHandler(err);
+        return res.json(errorHandler("Database connection error", err));
       }
 
       let checkApiKey = `SELECT EXISTS(SELECT * FROM dev WHERE api_key = ?) AS count`
       conn.query(checkApiKey, [api_key], (err, result0) => {
         if (err) {
           return conn.rollback(() => {
-            errorHandler(err);
+            res.json(errorHandler("Database connection error", err));
           })
         }
         if (result0[0].count == 0) {
           return conn.rollback(() => {
-            errorHandler("API key not valid");
+            res.json(errorHandler("API Key not valid"));
           })
         }
 
@@ -54,9 +45,10 @@ router.post('/addcollection', (req, res) => {
         conn.query(insertCollection, [collection_name, currentDateTime, currentDateTime, user_id], (err, result1) => {
           if (err) {
             return conn.rollback(() => {
-              errorHandler(err);
+              res.json(errorHandler("Database connection error", err));
             })
           }
+
           let insertAlbums = `INSERT INTO collection_album (collection_album_id, album_num, collection_id, album_id) VALUES (NULL, ?, ?, ?)`
           for (i = 1; i < album_ids.length; i++) {
             insertAlbums += `, (NULL, ?, ?, ?)`
@@ -72,26 +64,26 @@ router.post('/addcollection', (req, res) => {
           conn.query(insertAlbums, inputs, (err, result2) => {
             if (err) {
               return conn.rollback(() => {
-                errorHandler(err);
+                res.json(errorHandler("Database connection error", err));
               })
             }
 
             conn.commit((err) => {
               if (err) {
                 return conn.rollback(() => {
-                  errorHandler(err);
+                  res.json(errorHandler("Database connection error", err));
                 })
               } else {
-                res.json({
-                  success: true,
-                  message: "collection successfully added",
-                  itemsAdded: {
-                    user_id,
-                    collection_id,
-                    collection_name,
-                    album_ids,
-                  }
-                })
+
+                let itemsAdded = {
+                  user_id,
+                  collection_id,
+                  collection_name,
+                  album_ids,
+                }
+
+                res.json(dataHandler("Collection successfully added", itemsAdded))
+
               }
             })
           })

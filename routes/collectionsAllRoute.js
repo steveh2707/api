@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router();
 const connection = require('../db')
+const errorHandler = require('./handlers').errorHandler
+const dataHandler = require('./handlers').dataHandler
 
 router.get('/collections', (req, res) => {
 
@@ -24,7 +26,7 @@ router.get('/collections', (req, res) => {
 
   connection.query(sql, [pagestart, pageend], (err, response) => {
     if (err) {
-      res.json(err)
+      res.json(errorHandler("Database connection error", err));
     } else {
       let collections = response[0]
       let albums = response[1]
@@ -42,7 +44,7 @@ router.get('/collections', (req, res) => {
         })
       })
 
-      res.json(collections)
+      res.json(dataHandler("Successfully loaded collections", collections))
     }
 
   })

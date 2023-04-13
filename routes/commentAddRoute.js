@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router();
 const connection = require('../db')
+const errorHandler = require('./handlers').errorHandler
+const dataHandler = require('./handlers').dataHandler
 
 
 router.post('/addcomment/:collection_id', (req, res) => {
@@ -18,15 +20,9 @@ router.post('/addcomment/:collection_id', (req, res) => {
 
   connection.query(sql, [comment_message, currentDateTime, c_id, user_id], (err, response) => {
 
-    if (err) {
-      res.json(err)
-    } else {
-      console.log(response)
-      res.json({
-        success: true,
-        message: "comment successfully added",
-      })
-    }
+    if (err) return res.json(errorHandler("Database connection error", err));
+
+    res.json(dataHandler("Comment successfully added"))
   })
 
 })

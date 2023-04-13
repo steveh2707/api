@@ -4,28 +4,33 @@ const connection = require('./db')
 
 // import routes
 const loginRoute = require('./routes/loginRoute')
-const allCollectionsRoute = require('./routes/allCollectionsRoute')
-const allAlbumsRoute = require('./routes/allAlbumsRoute')
-const allArtistsRoute = require('./routes/allArtistsRoute')
-const singleCollectionRoute = require('./routes/singleCollectionRoute')
-const singleAlbumRoute = require('./routes/singleAlbumRoute')
-const newCollectionRoute = require('./routes/newCollectionRoute')
-const reordercollectionRoute = require('./routes/reorderCollectionRoute')
-const userCollectionsRoute = require('./routes/userCollectionsRoute')
-const newCommentRoute = require('./routes/newCommentRoute')
+
+const collectionsAllRoute = require('./routes/collectionsAllRoute')
+const collectionsUserRoute = require('./routes/collectionsUserRoute')
+const collectionRoute = require('./routes/collectionRoute')
+const collectionAddRoute = require('./routes/collectionAddRoute')
+const collectionReorderRoute = require('./routes/collectionReorderRoute')
+const commentAddRoute = require('./routes/commentAddRoute')
+
+const albumsAllRoute = require('./routes/albumsAllRoute')
+const albumRoute = require('./routes/albumRoute')
+const artistsAllRoute = require('./routes/artistsAllRoute')
+
 
 app.use(express.urlencoded({ extended: true }));
 
 app.use(loginRoute)
-app.use(allCollectionsRoute)
-app.use(allAlbumsRoute)
-app.use(allArtistsRoute)
-app.use(singleCollectionRoute)
-app.use(singleAlbumRoute)
-app.use(newCollectionRoute)
-app.use(reordercollectionRoute)
-app.use(userCollectionsRoute)
-app.use(newCommentRoute)
+
+app.use(collectionsAllRoute)
+app.use(collectionsUserRoute)
+app.use(collectionRoute)
+app.use(collectionAddRoute)
+app.use(collectionReorderRoute)
+app.use(commentAddRoute)
+
+app.use(albumsAllRoute)
+app.use(albumRoute)
+app.use(artistsAllRoute)
 
 app.listen((process.env.port || 4000), () => {
   console.log("API listening on port: 4000")

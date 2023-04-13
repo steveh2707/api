@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router();
 const connection = require('../db')
+const errorHandler = require('./handlers').errorHandler
+const dataHandler = require('./handlers').dataHandler
 
 router.get('/users/:userid', (req, res) => {
 
@@ -18,28 +20,25 @@ router.get('/users/:userid', (req, res) => {
   `
 
   connection.query(sql, [u_id], (err, response) => {
-    if (err) {
-      res.json(err)
-    } else {
-      let collections = response[0]
-      let albums = response[1]
+    if (err) return res.json(errorHandler("Database connection error", err));
 
-      // add albums to collections array
-      collections.forEach(collection => {
+    let collections = response[0]
+    let albums = response[1]
 
-        collection.albumImages = [];
+    // add albums to collections array
+    collections.forEach(collection => {
 
-        // add artists to albums array
-        albums.forEach(album => {
-          if (collection.collection_id == album.collection_id) {
-            collection.albumImages.push(album.cover_image_url)
-          }
-        })
+      collection.albumImages = [];
+
+      // add artists to albums array
+      albums.forEach(album => {
+        if (collection.collection_id == album.collection_id) {
+          collection.albumImages.push(album.cover_image_url)
+        }
       })
+    })
 
-      res.json(collections)
-    }
-
+    res.json(dataHandler("Successfully loaded collections", collections))
   })
 })
 

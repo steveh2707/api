@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router();
 const connection = require('../db')
+const errorHandler = require('./handlers').errorHandler
+const dataHandler = require('./handlers').dataHandler
 
 router.post('/login', (req, res) => {
 
@@ -11,31 +13,21 @@ router.post('/login', (req, res) => {
     SELECT * FROM user WHERE user_name = ? AND user_password = ?
   `
 
-  // console.log(req.body)
-  // console.log(password)
-
   connection.query(sql, [user_name, password], (err, response) => {
 
-    if (err) {
-      res.json(err)
-    } else {
+    if (err) return res.json(errorHandler("Database connection error", err));
 
-      if (response && response.length) {
-        res.json({
-          success: true,
-          message: "user successfully logged in",
-          user: {
-            user_id: response[0].user_id,
-            user_name: response[0].user_name
-          }
-        })
-      } else (
-        res.json({
-          success: false,
-          message: "Unsuccessful login - username or password incorrect",
-        })
-      )
-    }
+    if (response && response.length) {
+
+      let user = {
+        user_id: response[0].user_id,
+        user_name: response[0].user_name
+      }
+
+      res.json(dataHandler("User successfully logged in", user))
+
+    } else res.json(errorHandler("Unsuccessful login - username or password incorrect", err));
+
   })
 })
 
