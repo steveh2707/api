@@ -14,6 +14,7 @@ const commentAddRoute = require('./routes/commentAddRoute')
 
 const albumsAllRoute = require('./routes/albumsAllRoute')
 const albumRoute = require('./routes/albumRoute')
+const albumAddToCollectionRoute = require('./routes/albumAddToCollectionRoute')
 const artistsAllRoute = require('./routes/artistsAllRoute')
 
 
@@ -30,6 +31,7 @@ app.use(commentAddRoute)
 
 app.use(albumsAllRoute)
 app.use(albumRoute)
+app.use(albumAddToCollectionRoute)
 app.use(artistsAllRoute)
 
 app.listen((process.env.port || 4000), () => {

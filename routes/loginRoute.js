@@ -10,7 +10,7 @@ router.post('/login', (req, res) => {
   let password = req.body.password
 
   let sql = `
-    SELECT * FROM user WHERE user_name = ? AND user_password = ?
+    SELECT * FROM user WHERE user_name = ? AND user_password = ?;
   `
 
   connection.query(sql, [user_name, password], (err, response) => {
@@ -24,7 +24,17 @@ router.post('/login', (req, res) => {
         user_name: response[0].user_name
       }
 
-      res.json(dataHandler("User successfully logged in", user))
+
+
+      let collectionsSql = `SELECT collection_id, collection_name FROM collection WHERE user_id=?`
+      connection.query(collectionsSql, [response[0].user_id], (err, response2) => {
+        if (err) {
+          console.log(err)
+        } else {
+          user.user_collections = response2
+        }
+        res.json(dataHandler("User successfully logged in", user))
+      })
 
     } else res.json(errorHandler("Unsuccessful login - username or password incorrect", err));
 
