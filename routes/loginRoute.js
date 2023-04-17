@@ -24,15 +24,12 @@ router.post('/login', (req, res) => {
         user_name: response[0].user_name
       }
 
-
-
       let collectionsSql = `SELECT collection_id, collection_name FROM collection WHERE user_id=?`
       connection.query(collectionsSql, [response[0].user_id], (err, response2) => {
-        if (err) {
-          console.log(err)
-        } else {
-          user.user_collections = response2
-        }
+        if (err) return res.json(errorHandler("Database connection error", err));
+
+        user.user_collections = response2
+
         res.json(dataHandler("User successfully logged in", user))
       })
 
