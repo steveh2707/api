@@ -19,6 +19,8 @@ const albumsAllRoute = require('./routes/albumsAllRoute')
 const albumRoute = require('./routes/albumRoute')
 const artistsAllRoute = require('./routes/artistsAllRoute')
 
+const searchRoute = require('./routes/searchRoute')
+
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -36,8 +38,9 @@ app.use(commentAddRoute)
 
 app.use(albumsAllRoute)
 app.use(albumRoute)
-
 app.use(artistsAllRoute)
+
+app.use(searchRoute)
 
 app.listen((process.env.port || 4000), () => {
   console.log("API listening on port: 4000")

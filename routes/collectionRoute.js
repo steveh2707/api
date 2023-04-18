@@ -8,6 +8,10 @@ router.get('/collections/:collectionid', (req, res) => {
 
   let c_id = req.params.collectionid
 
+  let user_id = req.query.user_id;
+
+  // console.log(user_id)
+
   let sql = `
   SELECT collection_id, collection_name, collection_creation_date, collection_last_edit_date, collection.user_id, user_name 
     FROM collection
@@ -27,9 +31,13 @@ router.get('/collections/:collectionid', (req, res) => {
     LEFT JOIN user on comment.user_id=user.user_id
     WHERE collection_id=?
     ORDER BY comment_date_time DESC;
+  SELECT COUNT(*) as count
+    FROM likes WHERE collection_id=? AND user_id=?;
+  SELECT COUNT(*) as count
+    FROM likes WHERE collection_id=?;
   `
 
-  connection.query(sql, [c_id, c_id, c_id], (err, response) => {
+  connection.query(sql, [c_id, c_id, c_id, c_id, user_id, c_id], (err, response) => {
     if (err) return res.json(errorHandler("Database connection error", err));
 
     try {
@@ -37,6 +45,9 @@ router.get('/collections/:collectionid', (req, res) => {
       let albums = response[1]
       let artists = response[2]
       let comments = response[3]
+
+      collectiondetails.numLikes = response[5][0].count
+      collectiondetails.liked = response[4][0].count != 0
 
       collectiondetails.albums = []
       albums.forEach(album => {
