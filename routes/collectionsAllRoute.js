@@ -7,6 +7,7 @@ const dataHandler = require('./handlers').dataHandler
 router.get('/collections', (req, res) => {
 
   let frontEndPageNum = parseInt(req.query.page)
+  let sort = req.query.sort
 
   let mySQLPageNum = frontEndPageNum - 1;
 
@@ -15,12 +16,18 @@ router.get('/collections', (req, res) => {
   let pagestart = mySQLPageNum * resultsPerPage;
   let pageend = pagestart + resultsPerPage;
 
+  let sortSQL = "collection_last_edit_date"
+  if (sort === "likes") sortSQL = "likes"
+  if (sort === "comments") sortSQL = "comments"
+
   let sql = `
-  SELECT collection_id, collection_name, collection_creation_date, collection_last_edit_date, collection.user_id, user_name 
+  SELECT collection.collection_id, collection_name, collection_creation_date, collection_last_edit_date, collection.user_id, user_name,
+	  (SELECT COUNT(*) FROM likes WHERE likes.collection_id=collection.collection_id) as likes,
+    (SELECT COUNT(*) FROM comment WHERE comment.collection_id=collection.collection_id) as comments
     FROM collection
     LEFT JOIN user on collection.user_id=user.user_id  
-    ORDER BY collection_last_edit_date DESC
-    LIMIT ?, ?;
+    ORDER BY ${sortSQL} DESC
+    LIMIT ?,?;
   SELECT collection_id, cover_image_url FROM collection_album
     INNER JOIN album on collection_album.album_id=album.album_id
     ORDER BY album_num;
