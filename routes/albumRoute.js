@@ -63,7 +63,7 @@ router.get('/albums/:albumid', (req, res) => {
 
       res.json(dataHandler("Successfully loaded album", albumdetails))
     } catch {
-      res.json(errorHandler("Collection does not exist", err));
+      res.json(errorHandler("Album does not exist", err));
     }
 
   })
