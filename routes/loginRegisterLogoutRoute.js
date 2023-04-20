@@ -39,4 +39,45 @@ router.post('/login', (req, res) => {
 })
 
 
+router.post('/register', (req, res) => {
+
+  let user_name = req.body.user_name;
+  let password = req.body.password;
+  let dob = req.body.dob;
+  let gender = req.body.gender
+  let nationality = req.body.nationality
+
+  let checkUserNameSql = `
+  SELECT COUNT(*) as count FROM user WHERE user_name=?;
+  `
+
+  let insertSql = `
+  INSERT INTO user (user_id, user_name, user_password, gender, dob, nationality) VALUES (NULL, ?, ?, ?, ?, ?)
+  `
+
+  console.log(req.body)
+
+  connection.query(checkUserNameSql, [user_name], (err, response) => {
+    if (err) return res.json(errorHandler("Database connection error", err));
+
+    if (response[0].count > 0) return res.json(errorHandler("Username already exists", err));
+
+    connection.query(insertSql, [user_name, password, gender, dob, nationality], (err, response2) => {
+      if (err) return res.json(errorHandler("Database connection error", err));
+
+      console.log(response2.insertId)
+
+      let user = {
+        user_id: response2.insertId,
+        user_name: user_name
+      }
+
+      res.json(dataHandler("User successfully logged in", user))
+    })
+
+  })
+
+})
+
+
 module.exports = router;

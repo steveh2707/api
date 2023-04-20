@@ -17,9 +17,10 @@ router.get('/users/:userid', (req, res) => {
   SELECT collection_id, cover_image_url FROM collection_album
     INNER JOIN album on collection_album.album_id=album.album_id
     ORDER BY album_num;
+  SELECT user_name FROM user where user_id=?;
   `
 
-  connection.query(sql, [u_id], (err, response) => {
+  connection.query(sql, [u_id, u_id], (err, response) => {
     if (err) return res.json(errorHandler("Database connection error", err));
 
     let collections = response[0]
@@ -38,7 +39,14 @@ router.get('/users/:userid', (req, res) => {
       })
     })
 
-    res.json(dataHandler("Successfully loaded collections", collections))
+    let responseJson = dataHandler("Successfully loaded collections", collections)
+
+    responseJson.user = {
+      user_id: u_id,
+      user_name: response[2][0].user_name
+    }
+
+    res.json(responseJson)
   })
 })
 
