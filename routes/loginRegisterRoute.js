@@ -10,7 +10,7 @@ router.post('/login', (req, res) => {
   let password = req.body.password
 
   let sql = `
-    SELECT * FROM user WHERE user_name = ? AND user_password = ?;
+    SELECT * FROM user WHERE user_name = ? AND user_password = MD5(?);
   `
 
   connection.query(sql, [user_name, password], (err, response) => {
@@ -52,7 +52,7 @@ router.post('/register', (req, res) => {
   `
 
   let insertSql = `
-  INSERT INTO user (user_id, user_name, user_password, gender, dob, nationality) VALUES (NULL, ?, ?, ?, ?, ?)
+  INSERT INTO user (user_id, user_name, user_password, gender, dob, nationality) VALUES (NULL, ?, MD5(?), ?, ?, ?)
   `
 
   console.log(req.body)

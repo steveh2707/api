@@ -13,7 +13,10 @@ router.get('/albums', (req, res) => {
     LEFT JOIN genre on album.primary_genre_id=genre.genre_id;
   SELECT album_id, artist.artist_id, artist_name 
     FROM album_artist
-    LEFT JOIN artist on album_artist.artist_id=artist.artist_id
+    LEFT JOIN artist on album_artist.artist_id=artist.artist_id;
+  SELECT album_id, genre.genre_id, genre_name
+    FROM album_subgenre
+    LEFT JOIN genre on album_subgenre.genre_id=genre.genre_id;
   `
 
   connection.query(sql, (err, response) => {
@@ -21,16 +24,26 @@ router.get('/albums', (req, res) => {
 
     let albumdetails = response[0];
     let artists = response[1];
+    let subgenres = response[2];
 
-    // add artists to albums array
     albumdetails.forEach(album => {
-      album.albumArtists = [];
 
+      album.albumArtists = [];
       artists.forEach(artist => {
         if (artist.album_id == album.album_id) {
           album.albumArtists.push({
             artist_id: artist.artist_id,
             artist_name: artist.artist_name
+          })
+        }
+      })
+
+      album.subGenres = [];
+      subgenres.forEach(genre => {
+        if (genre.album_id == album.album_id) {
+          album.subGenres.push({
+            genre_id: genre.genre_id,
+            genre_name: genre.genre_name
           })
         }
       })

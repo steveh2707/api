@@ -3,7 +3,7 @@ const app = express();
 const connection = require('./db')
 
 // import routes
-const loginRegisterLogoutRoute = require('./routes/loginRegisterLogoutRoute')
+const loginRegisterRoute = require('./routes/loginRegisterRoute')
 
 const collectionsAllRoute = require('./routes/collectionsAllRoute')
 const collectionsUserRoute = require('./routes/collectionsUserRoute')
@@ -25,7 +25,7 @@ const searchRoute = require('./routes/searchRoute')
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use(loginRegisterLogoutRoute)
+app.use(loginRegisterRoute)
 
 app.use(collectionsAllRoute)
 app.use(collectionsUserRoute)

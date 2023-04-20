@@ -9,7 +9,9 @@ router.get('/users/:userid', (req, res) => {
   let u_id = req.params.userid
 
   let sql = `
-  SELECT collection_id, collection_name, collection_creation_date, collection_last_edit_date, collection.user_id, user_name 
+  SELECT collection_id, collection_name, collection_creation_date, collection_last_edit_date, collection.user_id, user_name,
+    (SELECT COUNT(*) FROM likes WHERE likes.collection_id=collection.collection_id) as likes,
+    (SELECT COUNT(*) FROM comment WHERE comment.collection_id=collection.collection_id) as comments 
     FROM collection
     LEFT JOIN user on collection.user_id=user.user_id  
     WHERE collection.user_id=?
