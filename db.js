@@ -1,12 +1,13 @@
 const mysql = require('mysql')
+require('dotenv').config()
 
 const pool = mysql.createPool({
   connectionLimit: 10,
   host: 'localhost',
   user: 'root',
-  password: 'root',
-  database: 'stacksofwax',
-  port: '8889',
+  password: process.env.MAMP_PASSWORD,
+  database: '40076592',
+  port: process.env.MAMP_PORT,
   multipleStatements: true,
   waitForConnections: true,
   queueLimit: 10

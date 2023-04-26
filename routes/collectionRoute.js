@@ -7,10 +7,7 @@ const dataHandler = require('./handlers').dataHandler
 router.get('/collections/:collectionid', (req, res) => {
 
   let c_id = req.params.collectionid
-
   let user_id = req.query.user_id;
-
-  // console.log(user_id)
 
   let sql = `
   SELECT collection_id, collection_name, collection_creation_date, collection_last_edit_date, collection.user_id, user_name 

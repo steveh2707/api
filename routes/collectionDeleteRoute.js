@@ -12,9 +12,10 @@ router.post('/deletecollection/:collectionid', (req, res) => {
   let checkUserSql = `SELECT user_id FROM collection WHERE collection_id=?;`
 
   let deleteSQL = `
-  DELETE FROM collection_album where collection_id=?;
-  DELETE FROM comment where collection_id=?;
-  DELETE FROM collection where collection_id=?;
+  DELETE FROM collection_album WHERE collection_id=?;
+  DELETE FROM comment WHERE collection_id=?;
+  DELETE FROM likes WHERE collection_id=?;
+  DELETE FROM collection WHERE collection_id=?;
   `
 
   connection.query(checkUserSql, [c_id], (err, response) => {
@@ -22,7 +23,7 @@ router.post('/deletecollection/:collectionid', (req, res) => {
 
     if (response[0].user_id != userID) return res.json(errorHandler("Wrong user"));
 
-    connection.query(deleteSQL, [c_id, c_id, c_id], (err, response) => {
+    connection.query(deleteSQL, [c_id, c_id, c_id, c_id], (err, response) => {
       if (err) return res.json(errorHandler("Database connection error", err));
 
       res.json(dataHandler("Collection deleted"))

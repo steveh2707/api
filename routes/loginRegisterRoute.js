@@ -52,7 +52,8 @@ router.post('/register', (req, res) => {
   `
 
   let insertSql = `
-  INSERT INTO user (user_id, user_name, user_password, gender, dob, nationality) VALUES (NULL, ?, MD5(?), ?, ?, ?)
+  INSERT INTO user (user_id, user_name, user_password, user_gender, user_dob, user_nationality) 
+  VALUES (NULL, ?, MD5(?), ?, ?, ?)
   `
 
   console.log(req.body)
