@@ -56,8 +56,6 @@ router.post('/register', (req, res) => {
   VALUES (NULL, ?, MD5(?), ?, ?, ?)
   `
 
-  console.log(req.body)
-
   connection.query(checkUserNameSql, [user_name], (err, response) => {
     if (err) return res.json(errorHandler("Database connection error", err));
 
@@ -65,8 +63,6 @@ router.post('/register', (req, res) => {
 
     connection.query(insertSql, [user_name, password, gender, dob, nationality], (err, response2) => {
       if (err) return res.json(errorHandler("Database connection error", err));
-
-      console.log(response2.insertId)
 
       let user = {
         user_id: response2.insertId,
